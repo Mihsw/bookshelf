@@ -1,0 +1,1811 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bookshelf</title>
+
+    <style>
+
+      @font-face {
+        font-family: "Caveat";
+        font-style: normal;
+        font-weight: 500;
+        font-display: swap;
+        src: url("fonts/Caveat-500.ttf") format("truetype");
+      }
+
+      @font-face {
+        font-family: "Caveat";
+        font-style: normal;
+        font-weight: 600;
+        font-display: swap;
+        src: url("fonts/Caveat-600.ttf") format("truetype");
+      }
+
+      @font-face {
+        font-family: "Caveat";
+        font-style: normal;
+        font-weight: 700;
+        font-display: swap;
+        src: url("fonts/Caveat-700.ttf") format("truetype");
+      }
+
+      @font-face {
+        font-family: "Space Mono";
+        font-style: normal;
+        font-weight: 400;
+        font-display: swap;
+        src: url("fonts/SpaceMono-Regular.ttf") format("truetype");
+      }
+
+      @font-face {
+        font-family: "Space Mono";
+        font-style: normal;
+        font-weight: 700;
+        font-display: swap;
+        src: url("fonts/SpaceMono-Bold.ttf") format("truetype");
+      }
+
+      :root {
+        --ink: #101010;
+        --paper: #fffdf7;
+        --sun: #ffd400;
+        --font-mono: "Space Mono", ui-monospace, monospace;
+        --font-hand: "Caveat", cursive;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      html {
+        -webkit-text-size-adjust: 100%;
+        tab-size: 4;
+      }
+
+      body {
+        min-height: 100vh;
+        background-color: var(--paper);
+        background-image: radial-gradient(#1010100e 1.1px, transparent 1.1px);
+        background-size: 22px 22px;
+        color: var(--ink);
+        font-family: var(--font-mono);
+        line-height: 1.5;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      h1,
+      h2,
+      h3,
+      p {
+        font-size: inherit;
+        font-weight: inherit;
+      }
+
+      button,
+      input {
+        border: 0;
+        border-radius: 0;
+        color: inherit;
+        font: inherit;
+      }
+
+      button {
+        cursor: pointer;
+        background: transparent;
+      }
+
+      svg {
+        display: block;
+        /* vertical-align: middle; */
+      }
+
+      ::selection {
+        background: var(--sun);
+        color: var(--ink);
+      }
+
+      :focus-visible {
+        outline: 2.5px dashed var(--ink);
+        outline-offset: 3px;
+        border-radius: 6px;
+      }
+
+      .app {
+        min-height: 100vh;
+      }
+
+      .page-container {
+        width: 100%;
+        max-width: 64rem;
+        margin-inline: auto;
+        padding: 2rem 1.25rem 6rem;
+      }
+
+      .page-header {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 0.75rem;
+        margin-bottom: 1.75rem;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 0.625rem;
+        font-family: var(--font-hand);
+        font-size: 1.875rem;
+        font-weight: 700;
+        line-height: 1;
+      }
+
+      .brand-icon {
+        width: 1.75rem;
+        height: 1.75rem;
+        transform: rotate(-6deg);
+      }
+
+      .brand-label {
+        display: inline-block;
+        padding: 0 0.32em;
+        background: var(--sun);
+        border-radius: 8px 12px 9px 13px;
+        transform: rotate(-1.2deg);
+        -webkit-box-decoration-break: clone;
+        box-decoration-break: clone;
+      }
+
+      .header-controls {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 0.5rem;
+        max-width: 100%;
+      }
+
+      .sort-select {
+        width: 14.5rem;
+        max-width: 100%;
+        padding: 0.45rem 2rem 0.45rem 0.75rem;
+        border: 2.5px solid var(--ink);
+        border-radius: 14px 11px 15px 10px / 11px 15px 10px 14px;
+        appearance: none;
+        -webkit-appearance: none;
+        background-color: #fff;
+        background-image:
+          linear-gradient(45deg, transparent 50%, var(--ink) 50%),
+          linear-gradient(135deg, var(--ink) 50%, transparent 50%);
+        background-position:
+          calc(100% - 13px) 50%,
+          calc(100% - 8px) 50%;
+        background-repeat: no-repeat;
+        background-size: 5px 5px, 5px 5px;
+        color: var(--ink);
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        font-weight: 700;
+        line-height: 1.25;
+      }
+
+      .sort-select option {
+        background: #fff;
+        color: var(--ink);
+        font-family: var(--font-mono);
+      }
+
+      .display-options {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.35rem;
+        width: 100%;
+        margin-top: 0.25rem;
+      }
+
+      .display-option {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #101010b3;
+        cursor: pointer;
+        font-family: var(--font-mono);
+        font-size: 0.6875rem;
+        line-height: 1.25;
+        text-align: left;
+      }
+
+      .display-option:hover {
+        color: var(--ink);
+      }
+
+      .display-checkbox {
+        display: grid;
+        width: 1rem;
+        height: 1rem;
+        flex: 0 0 1rem;
+        place-items: center;
+        appearance: none;
+        -webkit-appearance: none;
+        border: 2px solid var(--ink);
+        border-radius: 6px 4px 5px 4px / 4px 5px 4px 6px;
+        background: #fff;
+        cursor: pointer;
+      }
+
+      .display-checkbox::after {
+        width: 0.45rem;
+        height: 0.25rem;
+        border-bottom: 2px solid var(--ink);
+        border-left: 2px solid var(--ink);
+        content: "";
+        opacity: 0;
+        transform: translateY(-0.08rem) rotate(-45deg) scale(0.6);
+        transition: opacity 0.15s, transform 0.15s;
+      }
+
+      .display-checkbox:checked {
+        background: var(--sun);
+      }
+
+      .display-checkbox:checked::after {
+        opacity: 1;
+        transform: translateY(-0.08rem) rotate(-45deg) scale(1);
+      }
+
+      .book-count { 
+        color: #1010108c;
+        font-size: 0.75rem;
+        line-height: 1;
+      }
+
+      .empty-message {
+        margin-top: -0.5rem;
+        margin-bottom: 1.5rem;
+        color: #10101099;
+        font-family: var(--font-hand);
+        font-size: 1.5rem;
+        line-height: 1.333333;
+      }
+
+      .empty-message[hidden] {
+        display: none;
+      }
+
+      .books-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1.25rem;
+      }
+
+      .reveal-wrap {
+        opacity: 0;
+      }
+
+      .reveal-wrap.is-in {
+        animation: card-in 0.55s cubic-bezier(0.22, 1.25, 0.4, 1) both;
+      }
+
+      .reveal-wrap.revealed-stable {
+        opacity: 1;
+        animation: none;
+      }
+
+      .book-card {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        aspect-ratio: 4 / 5;
+        border: 2.5px solid var(--ink);
+        border-radius: 22px 19px 24px 18px / 19px 24px 18px 22px;
+        background: var(--sun);
+        will-change: transform;
+        transition:
+          transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1),
+          box-shadow 0.28s;
+      }
+
+      .book-card:hover {
+        transform: translateY(-6px) rotate(-0.9deg);
+        box-shadow: 7px 9px #10101029;
+      }
+
+      .book-card:active {
+        transform: translateY(-2px) rotate(-0.3deg);
+      }
+
+      .book-card.is-link-enabled {
+        cursor: pointer;
+      }
+
+      .book-card.is-draggable {
+        cursor: grab;
+      }
+
+      .book-card.is-draggable:active {
+        cursor: grabbing;
+      }
+
+      .book-card.is-dragging {
+        opacity: 0.45;
+        cursor: grabbing;
+      }
+
+      .book-card.drag-over {
+        outline: 3px dashed var(--ink);
+        outline-offset: 3px;
+      }
+
+      .book-status-star {
+        position: absolute;
+        top: 0.75rem;
+        right: 0.75rem;
+        z-index: 1;
+        width: 1.5rem;
+        height: 1.5rem;
+        color: var(--ink);
+        pointer-events: none;
+      }
+
+      .book-card.leaving { 
+        pointer-events: none;
+        animation: card-out 0.28s ease-in forwards;
+      }
+
+      .book-title-area {
+        display: grid;
+        flex: 1;
+        place-items: center;
+        padding: 0.75rem 0.75rem 0;
+      }
+
+      .book-info {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        max-width: 100%;
+        gap: 0.25rem;
+        text-align: center;
+      }
+
+      .book-title {
+        overflow-wrap: anywhere;
+        color: var(--ink);
+        font-family: var(--font-mono);
+        font-size: 0.9375rem;
+        font-weight: 700;
+        line-height: 1.375;
+        text-align: center;
+      }
+
+      .book-author,
+      .book-page-time {
+        max-width: 100%;
+        overflow-wrap: anywhere;
+        color: #101010b3;
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        line-height: 1.25;
+        text-align: center;
+      }
+
+      .book-actions {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        padding: 0.75rem;
+      }
+
+      .sketch-pill {
+        border: 2.5px solid var(--ink);
+        border-radius: 47% 53% 50% 50% / 56% 48% 52% 44%;
+        background: #fff;
+      }
+
+      .icon-button {
+        display: grid;
+        width: clamp(48px, 30%, 54px);
+        height: auto;
+        flex: 0 0 clamp(48px, 30%, 54px);
+        aspect-ratio: 47 / 40;
+        place-items: center;
+        color: var(--ink);
+      }
+
+      .icon-button svg {
+        width: 1.25rem;
+        height: 1.25rem;
+      }
+
+      /* Set BUTTON_LAYOUT to "original" to restore the original lower-left buttons. */
+      :root[data-button-layout="original"] .book-actions {
+        justify-content: flex-start;
+        gap: 0.625rem;
+      }
+
+      :root[data-button-layout="original"] .icon-button {
+        width: 2.75rem;
+        height: 2.5rem;
+        flex: 0 1 auto;
+        aspect-ratio: auto;
+      }
+
+      .pill-button {
+        transition:
+          transform 0.2s cubic-bezier(0.34, 1.8, 0.64, 1),
+          box-shadow 0.2s,
+          background-color 0.2s;
+      }
+
+      .pill-button:hover {
+        transform: scale(1.12) rotate(-5deg);
+        box-shadow: 2px 3px #10101038;
+      }
+
+      .pill-button:active {
+        box-shadow: none;
+        transform: scale(0.9) rotate(0);
+      }
+
+      .add-card {
+        width: 100%;
+        text-align: left;
+      }
+
+      .add-symbol-area {
+        display: grid;
+        flex: 1;
+        place-items: center;
+        padding: 1rem 1rem 0;
+      }
+
+      .add-symbol {
+        width: 4rem;
+        height: 4rem;
+        transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+
+      .add-card:hover .add-symbol {
+        transform: rotate(92deg) scale(1.08);
+      }
+
+      .add-card:hover {
+        transform: translateY(-6px) rotate(0.9deg);
+        box-shadow: 7px 9px #10101029;
+      }
+
+      .add-label {
+        padding: 0 0.75rem 2rem;
+        color: var(--ink);
+        font-family: var(--font-mono);
+        font-size: 0.9375rem;
+        text-align: center;
+      }
+
+      .shelf-legend {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        column-gap: 0.5rem;
+        row-gap: 0.25rem;
+        margin-top: 2rem;
+        color: #10101080;
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+      }
+
+      .legend-icon {
+        display: inline-grid;
+        width: 1.5rem;
+        height: 1.25rem;
+        place-items: center;
+      }
+
+      .legend-icon svg {
+        width: 0.75rem;
+        height: 0.75rem;
+      }
+
+      .legend-separator {
+        margin-inline: 0.25rem;
+        color: #1010104d;
+      }
+
+      .modal-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 50;
+        display: grid;
+        place-items: center;
+        padding: 1rem;
+      }
+
+      .modal-backdrop {
+        position: absolute;
+        inset: 0;
+        cursor: default;
+        background: #10101059;
+      }
+
+      .modal-card {
+        position: relative;
+        width: 100%;
+        max-width: 24rem;
+        max-height: calc(100vh - 2rem);
+        overflow-y: auto;
+        padding: 1.5rem;
+        border: 2.5px solid var(--ink);
+        border-radius: 22px 19px 24px 18px / 19px 24px 18px 22px;
+        background: var(--sun);
+        box-shadow: 3px 4px #1010101a;
+      }
+
+      .modal-field + .modal-field {
+        margin-top: 1rem;
+      }
+
+      .finished-row {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-top: 0.75rem;
+        color: #101010b3;
+        font-size: 0.75rem;
+        font-weight: 700;
+      }
+
+      .finished-checkbox {
+        width: 1rem;
+        height: 1rem;
+        margin: 0;
+        accent-color: var(--ink);
+      }
+
+      .modal-heading-row {
+        display: flex;
+        align-items: center;
+        gap: 0.625rem;
+        margin-bottom: 0.25rem;
+      }
+
+      .modal-heading-icon {
+        display: grid;
+        width: 2.25rem;
+        height: 2.25rem;
+        flex-shrink: 0;
+        place-items: center;
+        color: var(--ink);
+      }
+
+      .modal-heading-icon svg {
+        width: 1.25rem;
+        height: 1.25rem;
+      }
+
+      .modal-heading {
+        font-family: var(--font-hand);
+        font-size: 1.875rem;
+        font-weight: 700;
+        line-height: 1;
+      }
+
+      .modal-description {
+        margin-bottom: 1rem;
+        color: #10101099;
+        font-size: 0.8125rem;
+        line-height: 1.375;
+      }
+
+      .modal-description strong {
+        color: var(--ink);
+        font-weight: 700;
+      }
+
+      .modal-label {
+        display: block;
+        margin-bottom: 0.375rem;
+        color: #101010b3;
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+
+      .title-input {
+        display: block;
+        width: 100%;
+        padding: 0.625rem 0.875rem;
+        border: 2.5px solid var(--ink);
+        border-radius: 14px 11px 15px 10px / 11px 15px 10px 14px;
+        background: #fff;
+        color: var(--ink);
+        font-family: var(--font-mono);
+        font-size: 0.9375rem;
+        font-weight: 700;
+      }
+
+      .title-input::placeholder {
+        color: #10101059;
+        font-weight: 400;
+      }
+
+      .modal-actions {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 0.75rem;
+        margin-top: 1.25rem;
+      }
+
+      .cancel-button,
+      .save-button {
+        padding: 0.375rem 1rem;
+        color: var(--ink);
+        font-family: var(--font-mono);
+        font-size: 0.875rem;
+        font-weight: 700;
+      }
+
+      .save-button {
+        padding-inline: 1.25rem;
+        border: 2.5px solid var(--ink);
+        border-radius: 14px 11px 15px 10px / 11px 15px 10px 14px;
+        background: var(--ink);
+        color: var(--sun);
+      }
+
+      .save-button:hover {
+        background: #101010d9;
+      }
+
+      .toast {
+        position: fixed;
+        bottom: 1.5rem;
+        left: 50%;
+        z-index: 40;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.625rem 1rem;
+        border: 2.5px solid var(--ink);
+        border-radius: 14px 11px 15px 10px / 11px 15px 10px 14px;
+        background: var(--ink);
+        box-shadow: 4px 5px #1010102e;
+        color: var(--paper);
+        font-family: var(--font-mono);
+        font-size: 0.875rem;
+        transform: translateX(-50%);
+      }
+
+      .toast-title,
+      .toast-undo {
+        color: var(--sun);
+        font-weight: 700;
+      }
+
+      .toast-undo {
+        text-decoration: underline;
+        text-decoration-thickness: 2px;
+        text-underline-offset: 4px;
+        transition: transform 0.15s;
+      }
+
+      .toast-undo:hover {
+        transform: scale(1.05) rotate(-2deg);
+      }
+
+      .toast-close {
+        margin-left: 0.25rem;
+        color: #fffdf780;
+        transition: color 0.15s;
+      }
+
+      .toast-close:hover {
+        color: var(--paper);
+      }
+
+      .toast-close svg {
+        width: 1rem;
+        height: 1rem;
+      }
+
+      @keyframes card-in {
+        from {
+          opacity: 0;
+          transform: translateY(20px) scale(0.9) rotate(-2.5deg);
+        }
+
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+
+      @keyframes card-out {
+        to {
+          opacity: 0;
+          transform: scale(0.72) rotate(6deg);
+        }
+      }
+
+      @keyframes backdrop-in {
+        from {
+          opacity: 0;
+        }
+
+        to {
+          opacity: 1;
+        }
+      }
+
+      @keyframes modal-in {
+        from {
+          opacity: 0;
+          transform: translateY(26px) scale(0.9) rotate(-2deg);
+        }
+
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+
+      @keyframes toast-in {
+        from {
+          opacity: 0;
+          transform: translate(-50%, 24px) scale(0.9);
+        }
+
+        to {
+          opacity: 1;
+          transform: translate(-50%) scale(1);
+        }
+      }
+
+      .backdrop-animated {
+        animation: backdrop-in 0.22s both;
+      }
+
+      .modal-animated {
+        animation: modal-in 0.32s cubic-bezier(0.22, 1.3, 0.4, 1) both;
+      }
+
+      .toast-animated {
+        animation: toast-in 0.3s cubic-bezier(0.22, 1.3, 0.4, 1) both;
+      }
+
+      .shake {
+        animation: shake 0.28s 2;
+      }
+
+      @keyframes shake {
+        0%,
+        100% {
+          transform: translate(0);
+        }
+
+        25% {
+          transform: translate(-5px) rotate(-0.5deg);
+        }
+
+        75% {
+          transform: translate(5px) rotate(0.5deg);
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
+
+        .reveal-wrap {
+          opacity: 1;
+        }
+      }
+
+      @media (min-width: 40rem) {
+        .page-container {
+          padding: 2.5rem 2rem 2.25rem;
+        }
+
+        .page-header {
+          margin-bottom: 2.25rem;
+        }
+
+        .brand {
+          font-size: 2.25rem;
+        }
+
+        .books-grid {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 1.75rem;
+        }
+
+        .book-actions {
+          padding: 0.875rem;
+        }
+
+        .add-symbol {
+          width: 4.5rem;
+          height: 4.5rem;
+        }
+
+        .add-label {
+          padding-bottom: 2.25rem;
+        }
+
+        .modal-card {
+          padding: 1.75rem;
+        }
+      }
+
+      @media (min-width: 64rem) {
+        .books-grid {
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="app" id="app">
+      <div class="page-container">
+        <header class="page-header">
+          <h1 class="brand">
+            <svg
+              class="brand-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path
+                d="M4.5 5.2 C 8 3.8, 11 4.2, 12 5.4 C 13 4.2, 16.5 3.7, 19.6 5.1 C 19.4 10, 19.5 14.6, 19.6 18.6 C 16.4 17.4, 13.2 17.9, 12 19.1 C 10.8 17.9, 7.8 17.5, 4.4 18.8 C 4.6 14.2, 4.5 9.7, 4.5 5.2 Z"
+              ></path>
+              <path d="M12 5.4 C 11.9 9.8, 12 14.5, 12 19.1"></path>
+            </svg>
+            <span class="brand-label">bookshelf</span>
+          </h1>
+          <div class="header-controls">
+            <select
+              class="sort-select"
+              id="sort-select"
+              aria-label="Order books by"
+            >
+              <option value="added-asc">Added first to last</option>
+              <option value="added-desc">Added last to first</option>
+              <option value="page-time-desc">Last edited first</option>
+              <option value="custom">Custom order</option>
+            </select>
+            <p class="book-count" id="book-count"></p>
+            <div class="display-options" aria-label="Book display options">
+              <label class="display-option" for="show-finished">
+                <input
+                  class="display-checkbox"
+                  id="show-finished"
+                  data-setting="showFinished"
+                  type="checkbox"
+                />
+                <span>Show if finished</span>
+              </label>
+              <label class="display-option" for="show-page-time">
+                <input
+                  class="display-checkbox"
+                  id="show-page-time"
+                  data-setting="showPageTime"
+                  type="checkbox"
+                />
+                <span>Show time/page number</span>
+              </label>
+              <label class="display-option" for="show-author">
+                <input
+                  class="display-checkbox"
+                  id="show-author"
+                  data-setting="showAuthor"
+                  type="checkbox"
+                />
+                <span>Show author below the book title</span>
+              </label>
+              <label class="display-option" for="follow-link">
+                <input
+                  class="display-checkbox"
+                  id="follow-link"
+                  data-setting="followLink"
+                  type="checkbox"
+                />
+                <span>Go to the link on click</span>
+              </label>
+            </div>
+          </div>
+        </header>
+
+        <p class="empty-message" id="empty-message" hidden>
+          the shelf is bare — start a fresh stack below.
+        </p>
+
+        <main>
+          <div class="books-grid" id="books-grid"></div>
+
+          <p class="shelf-legend">
+            <span class="sketch-pill legend-icon" aria-hidden="true">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.7"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M4.6 6.9 C 8.4 5.2, 15.6 5.1, 19.4 6.7"></path>
+                <path
+                  d="M12 6.7 C 11.7 10.4, 11.9 13.9, 11.8 17 C 11.75 18.7, 10.4 19.3, 8.9 19"
+                ></path>
+              </svg>
+            </span>
+            renames a book
+            <span class="legend-separator">·</span>
+            <span class="sketch-pill legend-icon" aria-hidden="true">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.7"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M6.2 7.1 C 9.6 10.7, 13.6 14.6, 18 17.7"></path>
+                <path
+                  d="M5.1 15.9 C 5.9 17, 6.8 17.4, 7.7 16.7 C 11.1 13.7, 14.9 9.8, 18.7 6.1"
+                ></path>
+              </svg>
+            </span>
+            takes it off the shelf
+          </p>
+        </main>
+      </div>
+    </div>
+
+    <div id="modal-root"></div>
+    <div id="toast-root"></div>
+
+    <script>
+      const BUTTON_LAYOUT = "current";
+      document.documentElement.dataset.buttonLayout = BUTTON_LAYOUT;
+
+      const STORAGE_KEY = "sketch-shelf.books.v1";
+      const SORT_STORAGE_KEY = "sketch-shelf.sort.v1";
+      const DISPLAY_SETTINGS_KEY = "sketch-shelf.display.v1";
+      const DEFAULT_BOOKS = [
+        { id: "b1", title: "book1", author: "", link: "", pageTime: "", finished: false },
+        { id: "b2", title: "book2", author: "", link: "", pageTime: "", finished: false },
+        { id: "b3", title: "book3", author: "", link: "", pageTime: "", finished: false },
+        { id: "b4", title: "book4", author: "", link: "", pageTime: "", finished: false },
+        { id: "b5", title: "book5", author: "", link: "", pageTime: "", finished: false },
+      ];
+
+      const booksGrid = document.getElementById("books-grid");
+      const bookCount = document.getElementById("book-count");
+      const sortSelect = document.getElementById("sort-select");
+      const emptyMessage = document.getElementById("empty-message");
+      const modalRoot = document.getElementById("modal-root");
+      const toastRoot = document.getElementById("toast-root");
+
+      let books = loadBooks();
+      let sortMode = loadSortMode();
+      sortSelect.value = sortMode;
+      sortSelect.addEventListener("change", () => {
+        sortMode = sortSelect.value;
+        saveSortMode();
+        renderShelf();
+      });
+
+      const displaySettings = loadDisplaySettings();
+      document.querySelectorAll(".display-checkbox").forEach((checkbox) => {
+        const settingName = checkbox.dataset.setting;
+        checkbox.checked = displaySettings[settingName];
+        checkbox.addEventListener("change", () => {
+          displaySettings[settingName] = checkbox.checked;
+          saveDisplaySettings();
+          renderShelf();
+        });
+      });
+
+      let leavingBookIds = new Set();
+      let draggedBookId = null;
+      let removedBook = null;
+      let toastTimer = null;
+      let modalKeyHandler = null;
+      const revealedItems = new Set();
+
+      const revealObserver = "IntersectionObserver" in window
+        ? new IntersectionObserver(
+            (entries) => {
+              for (const entry of entries) {
+                if (!entry.isIntersecting) continue;
+
+                const item = entry.target;
+                const revealKey = item.dataset.revealKey;
+                if (revealKey) revealedItems.add(revealKey);
+                item.classList.add("is-in");
+                revealObserver.unobserve(item);
+              }
+            },
+            {
+              threshold: 0.12,
+              rootMargin: "0px 0px -24px 0px",
+            },
+          )
+        : null;
+
+      function normalizeBook(book, index = 0) {
+        return {
+          id: book.id,
+          title: book.title,
+          author: typeof book.author === "string" ? book.author : "",
+          link: typeof book.link === "string" ? book.link : "",
+          pageTime: typeof book.pageTime === "string" ? book.pageTime : "",
+          finished: book.finished === true,
+          addedAt: Number.isFinite(book.addedAt) ? book.addedAt : index,
+          pageTimeUpdatedAt: Number.isFinite(book.pageTimeUpdatedAt)
+            ? book.pageTimeUpdatedAt
+            : 0,
+        };
+      }
+
+      function loadBooks() {
+        try {
+          const saved = localStorage.getItem(STORAGE_KEY);
+          if (!saved) return DEFAULT_BOOKS.map(normalizeBook);
+
+          const parsed = JSON.parse(saved);
+          if (
+            Array.isArray(parsed) &&
+            parsed.every(
+              (book) =>
+                book &&
+                typeof book.id === "string" &&
+                typeof book.title === "string",
+            )
+          ) {
+            return parsed.map(normalizeBook);
+          }
+        } catch {
+        }
+
+        return DEFAULT_BOOKS.map(normalizeBook);
+      }
+
+      function loadSortMode() {
+        try {
+          const saved = localStorage.getItem(SORT_STORAGE_KEY);
+          if (["added-asc", "added-desc", "page-time-desc"].includes(saved)) {
+            return saved;
+          }
+        } catch {
+        }
+
+        return "added-asc";
+      }
+
+      function saveSortMode() {
+        try {
+          localStorage.setItem(SORT_STORAGE_KEY, sortMode);
+        } catch {
+        }
+      }
+
+      function loadDisplaySettings() {
+        const defaults = {
+          showFinished: false,
+          showPageTime: false,
+          showAuthor: false,
+          followLink: false,
+        };
+
+        try {
+          const saved = localStorage.getItem(DISPLAY_SETTINGS_KEY);
+          if (!saved) return defaults;
+
+          const parsed = JSON.parse(saved);
+          return {
+            showFinished: parsed.showFinished === true,
+            showPageTime: parsed.showPageTime === true,
+            showAuthor: parsed.showAuthor === true,
+            followLink: parsed.followLink === true,
+          };
+        } catch {
+        }
+
+        return defaults;
+      }
+
+      function saveDisplaySettings() {
+        try {
+          localStorage.setItem(DISPLAY_SETTINGS_KEY, JSON.stringify(displaySettings));
+        } catch {
+        }
+      }
+
+      function saveBooks() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(books));
+        } catch {
+        }
+      }
+
+      function createId() {
+        if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
+          return crypto.randomUUID();
+        }
+
+        return `id-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+      }
+
+      function makeSvgIcon({
+        viewBox = "0 0 24 24",
+        className = "",
+        fill = "none",
+        stroke = "currentColor",
+        strokeWidth = 2.7,
+        paths,
+      }) {
+        const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        svg.setAttribute("viewBox", viewBox);
+        svg.setAttribute("fill", fill);
+        svg.setAttribute("stroke", stroke);
+        svg.setAttribute("stroke-width", strokeWidth);
+        svg.setAttribute("stroke-linecap", "round");
+        svg.setAttribute("stroke-linejoin", "round");
+        svg.setAttribute("aria-hidden", "true");
+        if (className) svg.setAttribute("class", className);
+
+        for (const pathData of paths) {
+          const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+          path.setAttribute("d", pathData);
+          svg.appendChild(path);
+        }
+
+        return svg;
+      }
+
+      function renameIcon(className = "") {
+        return makeSvgIcon({
+          className,
+          paths: [
+            "M4.6 6.9 C 8.4 5.2, 15.6 5.1, 19.4 6.7",
+            "M12 6.7 C 11.7 10.4, 11.9 13.9, 11.8 17 C 11.75 18.7, 10.4 19.3, 8.9 19",
+          ],
+        });
+      }
+
+      function deleteIcon(className = "") {
+        return makeSvgIcon({
+          className,
+          paths: [
+            "M6.2 7.1 C 9.6 10.7, 13.6 14.6, 18 17.7",
+            "M5.1 15.9 C 5.9 17, 6.8 17.4, 7.7 16.7 C 11.1 13.7, 14.9 9.8, 18.7 6.1",
+          ],
+        });
+      }
+
+      function addIcon(className = "") {
+        return makeSvgIcon({
+          viewBox: "0 0 100 100",
+          className,
+          fill: "#fff",
+          stroke: "#101010",
+          strokeWidth: 3,
+          paths: [
+            "M40 7 C 47 5, 55 6, 61 8 C 60 17, 61 26, 61 35 C 70 34, 80 35, 90 36 C 91 44, 90 53, 89 60 C 79 59, 70 60, 61 59 C 62 69, 61 80, 60 91 C 52 92, 44 91, 39 90 C 40 80, 39 69, 39 60 C 29 61, 18 60, 9 59 C 8 51, 9 43, 10 36 C 20 36, 30 36, 39 36 C 38 26, 39 16, 40 7 Z",
+          ],
+        });
+      }
+
+      function starIcon(className = "") {
+        return makeSvgIcon({
+          className,
+          fill: "#fff",
+          stroke: "#101010",
+          strokeWidth: 2.2,
+          paths: [
+            "M12 2.8 L14.85 8.58 L21.25 9.51 L16.63 14.02 L17.72 20.4 L12 17.39 L6.28 20.4 L7.37 14.02 L2.75 9.51 L9.15 8.58 Z",
+          ],
+        });
+      }
+
+      function addRevealAnimation(element, revealKey, index) {
+        element.dataset.revealKey = revealKey;
+        element.style.animationDelay = `${Math.min(index, 8) * 70}ms`;
+
+        if (revealedItems.has(revealKey)) {
+          element.classList.add("is-in", "revealed-stable");
+        } else if (!revealObserver) {
+          element.classList.add("is-in");
+        } else {
+          revealObserver.observe(element);
+        }
+      }
+
+      function createBookCard(book, index) {
+        const reveal = document.createElement("div");
+        reveal.className = "reveal-wrap";
+        addRevealAnimation(reveal, `book:${book.id}`, index);
+
+        const card = document.createElement("article");
+        card.className = "book-card";
+        if (leavingBookIds.has(book.id)) card.classList.add("leaving");
+
+        if (displaySettings.showFinished && book.finished) {
+          card.appendChild(starIcon("book-status-star"));
+        }
+
+        if (displaySettings.followLink && book.link.trim()) {
+          card.classList.add("is-link-enabled");
+          card.addEventListener("click", (event) => {
+            if (event.target.closest("button")) return;
+            window.location.assign(book.link.trim());
+          });
+        }
+
+        if (sortMode === "custom" && !displaySettings.followLink) {
+          enableCardDragging(card, book.id);
+        }
+
+        const titleArea = document.createElement("div");
+        titleArea.className = "book-title-area";
+
+        const bookInfo = document.createElement("div");
+        bookInfo.className = "book-info";
+
+        const title = document.createElement("h3");
+        title.className = "book-title";
+        title.textContent = book.title;
+        title.title = book.title;
+        bookInfo.appendChild(title);
+
+        if (displaySettings.showAuthor && book.author.trim()) {
+          const author = document.createElement("p");
+          author.className = "book-author";
+          author.textContent = book.author;
+          author.title = book.author;
+          bookInfo.appendChild(author);
+        }
+
+        if (displaySettings.showPageTime && book.pageTime.trim()) {
+          const pageTime = document.createElement("p");
+          pageTime.className = "book-page-time";
+          pageTime.textContent = book.pageTime;
+          pageTime.title = book.pageTime;
+          bookInfo.appendChild(pageTime);
+        }
+
+        titleArea.appendChild(bookInfo);
+
+        const actions = document.createElement("div");
+        actions.className = "book-actions";
+
+        const renameButton = document.createElement("button");
+        renameButton.type = "button";
+        renameButton.className = "sketch-pill pill-button icon-button";
+        renameButton.setAttribute("aria-label", `Rename ${book.title}`);
+        renameButton.title = "Rename";
+        renameButton.appendChild(renameIcon());
+        renameButton.addEventListener("click", () => openRenameDialog(book.id));
+
+        const deleteButton = document.createElement("button");
+        deleteButton.type = "button";
+        deleteButton.className = "sketch-pill pill-button icon-button";
+        deleteButton.setAttribute("aria-label", `Delete ${book.title}`);
+        deleteButton.title = "Delete";
+        deleteButton.appendChild(deleteIcon());
+        deleteButton.addEventListener("click", () => removeBook(book.id));
+
+        actions.append(renameButton, deleteButton);
+        card.append(titleArea, actions);
+        reveal.appendChild(card);
+        return reveal;
+      }
+
+      function enableCardDragging(card, bookId) {
+        card.draggable = true;
+        card.classList.add("is-draggable");
+        card.setAttribute("aria-grabbed", "false");
+
+        card.addEventListener("dragstart", (event) => {
+          if (
+            event.target instanceof Element &&
+            event.target.closest("button")
+          ) {
+            event.preventDefault();
+            return;
+          }
+
+          draggedBookId = bookId;
+          card.classList.add("is-dragging");
+          card.setAttribute("aria-grabbed", "true");
+
+          if (event.dataTransfer) {
+            event.dataTransfer.effectAllowed = "move";
+            event.dataTransfer.setData("text/plain", bookId);
+          }
+        });
+
+        card.addEventListener("dragover", (event) => {
+          if (!draggedBookId || draggedBookId === bookId) return;
+
+          event.preventDefault();
+          if (event.dataTransfer) event.dataTransfer.dropEffect = "move";
+          card.classList.add("drag-over");
+        });
+
+        card.addEventListener("dragleave", () => {
+          card.classList.remove("drag-over");
+        });
+
+        card.addEventListener("drop", (event) => {
+          event.preventDefault();
+          card.classList.remove("drag-over");
+
+          if (!draggedBookId || draggedBookId === bookId) return;
+
+          const sourceBookId = draggedBookId;
+          clearDragState();
+          reorderBooks(sourceBookId, bookId);
+        });
+
+        card.addEventListener("dragend", clearDragState);
+      }
+
+      function clearDragState() {
+        document.querySelectorAll(".is-dragging").forEach((card) => {
+          card.classList.remove("is-dragging");
+          card.setAttribute("aria-grabbed", "false");
+        });
+        document.querySelectorAll(".drag-over").forEach((card) => {
+          card.classList.remove("drag-over");
+        });
+        draggedBookId = null;
+      }
+
+      function reorderBooks(sourceBookId, targetBookId) {
+        const sourceIndex = books.findIndex((book) => book.id === sourceBookId);
+        const targetIndex = books.findIndex((book) => book.id === targetBookId);
+        if (sourceIndex === -1 || targetIndex === -1) return;
+
+        const [movedBook] = books.splice(sourceIndex, 1);
+        const insertionIndex = sourceIndex < targetIndex
+          ? targetIndex - 1
+          : targetIndex;
+        books.splice(insertionIndex, 0, movedBook);
+        saveBooks();
+        renderShelf();
+      }
+
+      function createAddCard(index) {
+        const reveal = document.createElement("div");
+        reveal.className = "reveal-wrap";
+        addRevealAnimation(reveal, "add-card", index);
+
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "add-card book-card";
+        button.setAttribute("aria-label", "Add a new book");
+        button.addEventListener("click", openAddDialog);
+
+        const symbolArea = document.createElement("span");
+        symbolArea.className = "add-symbol-area";
+        symbolArea.appendChild(addIcon("add-symbol"));
+
+        const label = document.createElement("span");
+        label.className = "add-label";
+        label.textContent = "Add a new book";
+
+        button.append(symbolArea, label);
+        reveal.appendChild(button);
+        return reveal;
+      }
+
+      function getBooksForDisplay() {
+        if (sortMode === "custom") return [...books];
+
+        const indexedBooks = books.map((book, index) => ({ book, index }));
+
+        indexedBooks.sort((left, right) => {
+          if (sortMode === "added-desc") {
+            return (
+              right.book.addedAt - left.book.addedAt ||
+              right.index - left.index
+            );
+          }
+
+          if (sortMode === "page-time-desc") {
+            const leftHasPageTime = left.book.pageTime.trim() !== "";
+            const rightHasPageTime = right.book.pageTime.trim() !== "";
+
+            if (leftHasPageTime !== rightHasPageTime) {
+              return rightHasPageTime - leftHasPageTime;
+            }
+
+            return (
+              right.book.pageTimeUpdatedAt - left.book.pageTimeUpdatedAt ||
+              left.index - right.index
+            );
+          }
+
+          return (
+            left.book.addedAt - right.book.addedAt ||
+            left.index - right.index
+          );
+        });
+
+        return indexedBooks.map(({ book }) => book);
+      }
+
+      function renderShelf() {
+        bookCount.textContent = books.length === 0
+          ? "no books yet"
+          : `${books.length} ${books.length === 1 ? "book" : "books"} on the shelf`;
+        emptyMessage.hidden = books.length !== 0;
+
+        booksGrid.replaceChildren();
+        getBooksForDisplay().forEach((book, index) => {
+          booksGrid.appendChild(createBookCard(book, index));
+        });
+        booksGrid.appendChild(createAddCard(books.length));
+      }
+
+      function nextBookTitle() {
+        let highestNumber = 0;
+
+        for (const book of books) {
+          const match = /^book(\d+)$/.exec(book.title);
+          if (match) highestNumber = Math.max(highestNumber, Number.parseInt(match[1], 10));
+        }
+
+        return `book${highestNumber + 1}`;
+      }
+
+      function removeBook(bookId) {
+        if (leavingBookIds.has(bookId)) return;
+
+        leavingBookIds.add(bookId);
+        renderShelf();
+
+        window.setTimeout(() => {
+          const index = books.findIndex((book) => book.id === bookId);
+          if (index === -1) return;
+
+          const book = books[index];
+          books = books.filter((entry) => entry.id !== bookId);
+          leavingBookIds.delete(bookId);
+          removedBook = { book, index };
+          saveBooks();
+          renderShelf();
+          showRemovalToast();
+        }, 280);
+      }
+
+      function openRenameDialog(bookId) {
+        const book = books.find((entry) => entry.id === bookId);
+        if (!book) return;
+
+        openBookDialog({
+          headingText: "Rename this book",
+          descriptionText: "Currently filed as",
+          initialBook: book,
+          onSave: (details) => saveRename(bookId, details),
+        });
+      }
+
+      function openAddDialog() {
+        openBookDialog({
+          headingText: "Adding a book",
+          descriptionText: "New book will be filed as",
+          initialBook: {
+            id: "",
+            title: nextBookTitle(),
+            author: "",
+            link: "",
+            pageTime: "",
+            finished: false,
+          },
+          onSave: saveNewBook,
+        });
+      }
+
+      function openBookDialog({
+        headingText,
+        descriptionText,
+        initialBook,
+        onSave,
+      }) {
+        closeBookDialog();
+
+        const book = normalizeBook(initialBook);
+        const overlay = document.createElement("div");
+        overlay.className = "modal-overlay";
+        overlay.setAttribute("role", "dialog");
+        overlay.setAttribute("aria-modal", "true");
+        overlay.setAttribute("aria-labelledby", "book-dialog-heading");
+
+        const backdrop = document.createElement("button");
+        backdrop.type = "button";
+        backdrop.className = "modal-backdrop backdrop-animated";
+        backdrop.setAttribute("aria-label", "Close book dialog");
+        backdrop.tabIndex = -1;
+        backdrop.addEventListener("click", closeBookDialog);
+
+        const card = document.createElement("div");
+        card.className = "modal-card modal-animated";
+
+        const headingRow = document.createElement("div");
+        headingRow.className = "modal-heading-row";
+
+        const headingIcon = document.createElement("span");
+        headingIcon.className = "sketch-pill modal-heading-icon";
+        headingIcon.appendChild(renameIcon());
+
+        const heading = document.createElement("h2");
+        heading.id = "book-dialog-heading";
+        heading.className = "modal-heading";
+        heading.textContent = headingText;
+        headingRow.append(headingIcon, heading);
+
+        const description = document.createElement("p");
+        description.className = "modal-description";
+        description.append(`${descriptionText} `);
+        const currentTitle = document.createElement("strong");
+        currentTitle.textContent = `“${book.title}”`;
+        description.appendChild(currentTitle);
+
+        const titleField = createDialogField({
+          id: "book-title-input",
+          labelText: "Title",
+          value: book.title,
+          placeholder: "book title…",
+          maxLength: 40,
+        });
+        const authorField = createDialogField({
+          id: "book-author-input",
+          labelText: "Author",
+          value: book.author,
+          placeholder: "author name…",
+        });
+        const linkField = createDialogField({
+          id: "book-link-input",
+          labelText: "Link (optional)",
+          value: book.link,
+          placeholder: "https://…",
+        });
+        const pageTimeField = createDialogField({
+          id: "book-page-time-input",
+          labelText: "Page / time",
+          value: book.pageTime,
+          placeholder: "page 120 or 01:24:30…",
+        });
+
+        const finishedRow = document.createElement("label");
+        finishedRow.className = "finished-row";
+
+        const finishedCheckbox = document.createElement("input");
+        finishedCheckbox.type = "checkbox";
+        finishedCheckbox.className = "finished-checkbox";
+        finishedCheckbox.checked = book.finished;
+
+        const finishedText = document.createElement("span");
+        finishedText.textContent = "Finished the book";
+        finishedRow.append(finishedCheckbox, finishedText);
+
+        const actions = document.createElement("div");
+        actions.className = "modal-actions";
+
+        const cancelButton = document.createElement("button");
+        cancelButton.type = "button";
+        cancelButton.className = "sketch-pill pill-button cancel-button";
+        cancelButton.textContent = "cancel";
+        cancelButton.addEventListener("click", closeBookDialog);
+
+        const saveButton = document.createElement("button");
+        saveButton.type = "button";
+        saveButton.className = "pill-button save-button";
+        saveButton.textContent = "save it";
+
+        const submit = () => {
+          const title = getTitleFromInput(titleField.input);
+          if (!title) return;
+
+          onSave({
+            title,
+            author: authorField.input.value.trim(),
+            link: linkField.input.value.trim(),
+            pageTime: pageTimeField.input.value.trim(),
+            finished: finishedCheckbox.checked,
+          });
+        };
+
+        saveButton.addEventListener("click", submit);
+        actions.append(cancelButton, saveButton);
+        card.append(
+          headingRow,
+          description,
+          titleField.field,
+          authorField.field,
+          linkField.field,
+          pageTimeField.field,
+          finishedRow,
+          actions,
+        );
+        overlay.append(backdrop, card);
+        modalRoot.replaceChildren(overlay);
+
+        modalKeyHandler = (event) => {
+          if (event.key === "Escape") closeBookDialog();
+        };
+        window.addEventListener("keydown", modalKeyHandler);
+        titleField.input.addEventListener("keydown", (event) => {
+          if (event.key === "Enter") submit();
+        });
+
+        titleField.input.focus();
+        titleField.input.select();
+      }
+
+      function createDialogField({
+        id,
+        labelText,
+        value,
+        placeholder,
+        maxLength,
+      }) {
+        const field = document.createElement("div");
+        field.className = "modal-field";
+
+        const label = document.createElement("label");
+        label.className = "modal-label";
+        label.setAttribute("for", id);
+        label.textContent = labelText;
+
+        const input = document.createElement("input");
+        input.id = id;
+        input.className = "title-input";
+        input.type = "text";
+        input.value = value;
+        input.placeholder = placeholder;
+        if (maxLength !== undefined) input.maxLength = maxLength;
+
+        field.append(label, input);
+        return { field, input };
+      }
+
+      function getTitleFromInput(input) {
+        const newTitle = input.value.trim();
+        if (newTitle) return newTitle;
+
+        input.classList.remove("shake");
+        void input.offsetWidth;
+        input.classList.add("shake");
+        input.focus();
+        window.setTimeout(() => input.classList.remove("shake"), 600);
+        return null;
+      }
+
+      function saveRename(bookId, details) {
+        books = books.map((book) => {
+          if (book.id !== bookId) return book;
+
+          const pageTimeChanged = book.pageTime !== details.pageTime;
+          return {
+            ...book,
+            ...details,
+            pageTimeUpdatedAt: pageTimeChanged
+              ? Date.now()
+              : book.pageTimeUpdatedAt,
+          };
+        });
+        saveBooks();
+        closeBookDialog();
+        renderShelf();
+      }
+
+      function saveNewBook(details) {
+        const now = Date.now();
+        books = [
+          ...books,
+          {
+            id: createId(),
+            ...details,
+            addedAt: now,
+            pageTimeUpdatedAt: details.pageTime ? now : 0,
+          },
+        ];
+        saveBooks();
+        closeBookDialog();
+        renderShelf();
+      }
+
+      function closeBookDialog() {
+        if (modalKeyHandler) {
+          window.removeEventListener("keydown", modalKeyHandler);
+          modalKeyHandler = null;
+        }
+        modalRoot.replaceChildren();
+      }
+
+      function showRemovalToast() {
+        if (toastTimer) window.clearTimeout(toastTimer);
+        toastRoot.replaceChildren();
+
+        if (!removedBook) return;
+
+        const toast = document.createElement("div");
+        toast.className = "toast toast-animated";
+        toast.setAttribute("role", "status");
+
+        const message = document.createElement("span");
+        const title = document.createElement("span");
+        title.className = "toast-title";
+        title.textContent = `“${removedBook.book.title}”`;
+        message.append(title, " was removed");
+
+        const undoButton = document.createElement("button");
+        undoButton.type = "button";
+        undoButton.className = "toast-undo";
+        undoButton.textContent = "undo";
+        undoButton.addEventListener("click", undoRemoval);
+
+        const closeButton = document.createElement("button");
+        closeButton.type = "button";
+        closeButton.className = "toast-close";
+        closeButton.setAttribute("aria-label", "Dismiss notification");
+        closeButton.appendChild(deleteIcon());
+        closeButton.addEventListener("click", dismissToast);
+
+        toast.append(message, undoButton, closeButton);
+        toastRoot.appendChild(toast);
+        toastTimer = window.setTimeout(dismissToast, 4500);
+      }
+
+      function undoRemoval() {
+        if (!removedBook) return;
+
+        const { book, index } = removedBook;
+        if (books.some((entry) => entry.id === book.id)) return;
+
+        const insertionIndex = Math.min(Math.max(index, 0), books.length);
+        books = [
+          ...books.slice(0, insertionIndex),
+          book,
+          ...books.slice(insertionIndex),
+        ];
+        removedBook = null;
+        saveBooks();
+        dismissToast();
+        renderShelf();
+      }
+
+      function dismissToast() {
+        if (toastTimer) {
+          window.clearTimeout(toastTimer);
+          toastTimer = null;
+        }
+        toastRoot.replaceChildren();
+        removedBook = null;
+      }
+
+      renderShelf();
+    </script>
+  </body>
+</html>
